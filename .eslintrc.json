@@ -1,4 +1,6 @@
 {
   "extends": ["@rocketseat/eslint-config/react"],
-  "rules": {}
+  "rules": {
+    "no-useless-return": "off"
+  }
 }
