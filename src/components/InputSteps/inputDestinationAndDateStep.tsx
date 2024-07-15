@@ -33,7 +33,7 @@ export function InputDestinationAndDateStep({
         />
       </div>
 
-      <div className="w-px h-6 bg-zinc-800"></div>
+      <div className="w-px h-6 bg-zinc-800" />
 
       {isGuestsInputOpen ? (
         <button
