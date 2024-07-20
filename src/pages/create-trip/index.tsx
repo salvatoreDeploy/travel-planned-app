@@ -7,8 +7,10 @@ import { Footer } from '../../components/Footer'
 import { Modal } from '../../components/Modal/Modal'
 import { ModalHeader } from '../../components/Modal/ModalHeader'
 import { ModalContent } from '../../components/Modal/ModalContent'
-import { X, User, Mail, AtSign, Plus } from 'lucide-react'
+import { X, User, Mail, AtSign, Plus, Loader } from 'lucide-react'
 import { Button } from '../../components/Button'
+import { DateRange } from 'react-day-picker'
+import { api } from '../../api/axios'
 
 export function CreateTripPage() {
   const [isGuestsInputOpen, setIsGuestsInputOpen] = useState(false)
@@ -16,6 +18,15 @@ export function CreateTripPage() {
   const [isConfirmTripModal, setIsConfirmTripModal] = useState(false)
 
   const [emailsToInvite, setEmailsToInvite] = useState<string[]>([])
+
+  const [destination, setDestination] = useState('')
+  const [ownerName, setOwnerName] = useState('')
+  const [ownerEmail, setOwnerEmail] = useState('')
+  const [eventStartAndDates, setEventStartAndDates] = useState<
+    DateRange | undefined
+  >()
+
+  const [isloading, setIsLoading] = useState(false)
 
   const navigate = useNavigate()
 
@@ -75,10 +86,44 @@ export function CreateTripPage() {
     setIsConfirmTripModal(false)
   }
 
-  function handleCreateTrip(event: FormEvent<HTMLFormElement>) {
+  async function handleCreateTrip(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
-    navigate('/trip/123/details')
+    /* if (!destination) {
+      return
+    }
+
+    if (!eventStartAndDates?.from || !eventStartAndDates?.to) {
+      return
+    }
+
+    if (emailsToInvite.length === 0) {
+      return
+    }
+
+    if (!ownerEmail || !ownerName) {
+      return
+    } */
+
+    try {
+      setIsLoading(true)
+      const response = await api.post('/register', {
+        destination,
+        starts_at: eventStartAndDates?.from,
+        ends_at: eventStartAndDates?.to,
+        owner_name: ownerName,
+        owner_email: ownerEmail,
+        emails_to_invite: emailsToInvite,
+      })
+
+      const { tripId } = response.data
+
+      navigate(`/trip/${tripId}/details`)
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -92,6 +137,9 @@ export function CreateTripPage() {
             handleAlterGuestsInput={handleAlterGuestsInput}
             handleOpenGuestsInput={handleOpenGuestsInput}
             isGuestsInputOpen={isGuestsInputOpen}
+            setDestination={setDestination}
+            setEventStartAndDates={setEventStartAndDates}
+            eventStartAndDates={eventStartAndDates}
           />
 
           {isGuestsInputOpen && (
@@ -195,6 +243,7 @@ export function CreateTripPage() {
                 name="name"
                 placeholder="Seu nome completo"
                 className="bg-transparent placeholder-zinc-400 outline-none"
+                onChange={(event) => setOwnerName(event.target.value)}
               />
             </div>
 
@@ -205,11 +254,20 @@ export function CreateTripPage() {
                 name="email"
                 placeholder="Seu e-mail pessoal"
                 className="bg-transparent placeholder-zinc-400 outline-none"
+                onChange={(event) => setOwnerEmail(event.target.value)}
               />
             </div>
 
-            <Button Bgcolor="primary" size="full">
-              Confirmar criação da viagem
+            <Button disabled={isloading} Bgcolor="primary" size="full">
+              {isloading ? (
+                <>
+                  {' '}
+                  <Loader className="text-zinc-950 animate-spin h-5 w-5 mr-3" />
+                  Processando...
+                </>
+              ) : (
+                'Confirmar criação da viagem'
+              )}
             </Button>
           </ModalContent>
         </Modal>
