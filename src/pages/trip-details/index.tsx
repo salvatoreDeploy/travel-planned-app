@@ -1,6 +1,7 @@
+/* eslint-disable camelcase */
 import { Calendar, Clock, Plus, Tag, X } from 'lucide-react'
 import { Separator } from '../../components/Separator'
-import { useState } from 'react'
+import { FormEvent, useState } from 'react'
 import { ImportantLinks } from './ImportantLinks'
 import { Guests } from './Guests'
 import { Activitys } from './Activitys'
@@ -9,8 +10,12 @@ import { Modal } from '../../components/Modal/Modal'
 import { Button } from '../../components/Button'
 import { ModalContent } from '../../components/Modal/ModalContent'
 import { ModalHeader } from '../../components/Modal/ModalHeader'
+import { api } from '../../api/axios'
+import { useParams } from 'react-router-dom'
 
 export function TripDetailsPage() {
+  const { tripId } = useParams()
+
   const [isCreateActivityModalOpen, setIsCreateActivityModalOpen] =
     useState(false)
 
@@ -20,6 +25,25 @@ export function TripDetailsPage() {
 
   function handleCreateActivityModalClose() {
     setIsCreateActivityModalOpen(false)
+  }
+
+  function createActivity(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+
+    const data = new FormData(event.currentTarget)
+
+    const title = data.get('activity_name')?.toString()
+    const date = data.get('activity_date')?.toString()
+    const hour = data.get('activity_hour')?.toString()
+
+    const occurs_at = `${date}:${hour}`
+
+    api.post(`/trip/${tripId}/activity`, {
+      title,
+      occurs_at,
+    })
+
+    window.document.location.reload()
   }
 
   return (
@@ -63,13 +87,13 @@ export function TripDetailsPage() {
               </p>
             </ModalHeader>
 
-            <ModalContent>
+            <ModalContent formSubmit={createActivity}>
               <div className="h-14 px-4 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center gap-2">
                 <Tag className="size-5 text-zinc-400" />
 
                 <input
                   type="text"
-                  name="activity"
+                  name="activity_name"
                   placeholder="Qual a atividade?"
                   className="bg-transparent placeholder-zinc-400 outline-none"
                 />
