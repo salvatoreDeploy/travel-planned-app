@@ -52,6 +52,12 @@ export function Guests() {
         <UserCog className="size-5" />
         Gerenciar convidados
       </Button>
+
+      {/* 
+        TODO: 
+          Criar componente modal para gerenciar os convidados
+          Criar estados, logica e chamada a api para efetivar as alterações
+      */}
     </div>
   )
 }

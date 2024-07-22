@@ -18,6 +18,13 @@ export function DestinationAndDateHeader() {
   const { tripId } = useParams()
   const [trip, setTrip] = useState<Trip | undefined>()
 
+  /* 
+     TODO: 
+        Criar estado bollean para botao alterar local e data assim habilitar os input, 
+        efetuar logica de troca de botão para confirmar novos dados,
+        função que vai receber os valores dos dados e fazer a chamada para api e voltar o estado dos inputs apara desabilitados 
+  */
+
   useEffect(() => {
     api
       .get(`/trip/${tripId}/details`)
@@ -26,6 +33,7 @@ export function DestinationAndDateHeader() {
 
 
   /* TODO: Criar função a parte em pasta utils */
+
   const displayedDate = trip
     ? format(trip.starts_at, "d' de 'LLL")
       .concat(' até ')
@@ -36,19 +44,37 @@ export function DestinationAndDateHeader() {
     <div className="px-4 h-16 rounded-xl bg-zinc-900 shadow-shape flex items-center justify-between">
       <div className="flex items-center gap-2">
         <MapPin className="size-5 text-zinc-400" />
-        <span className=" text-zinc-100">{trip?.destination}</span>
+        <input
+          disabled
+          type="text"
+          placeholder={trip?.destination}
+          className="bg-transparent placeholder-zinc-400 outline-none flex-1"
+        />
       </div>
 
       <div className="flex items-center gap-5">
         <div className="flex items-center gap-2">
-          <Calendar className="size-5 text-zinc-400" />
-          <span className=" text-zinc-100">{displayedDate}</span>
+          <button
+            onClick={() => { }}
+            disabled
+            className="flex items-center gap-2"
+          >
+            <Calendar className="size-5 text-zinc-400" />
+            <span className=" text-zinc-100">
+              {displayedDate ?? 'Quando?'}
+            </span>
+          </button>
         </div>
         <div className="w-px h-6 bg-zinc-800" />
         <Button Bgcolor="secondary">
           Alterar local/data
           <Settings2 className="size-5" />
         </Button>
+
+        {/* <Button Bgcolor="primary">
+          Confirmar alterações
+          <Settings2 className="size-5" />
+        </Button> */}
       </div>
     </div>
   )
